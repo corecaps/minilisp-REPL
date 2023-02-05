@@ -31,18 +31,24 @@ int	main(void)
       lispy    : /^/ <operator> <expr>+ /$/ ;             \
     ",
 			  Number, Operator, Expr, Lispy);
+	printf("\n>\tMiniLisp REPL Welcome\t <\n");
 	while (1)
 	{
-		line = readline("minilisp> ");
+		line = readline("MiniLisp\t> ");
 		if (!line)
 			break ;
+		if (strcmp(line, "exit") == 0)
+		{
+			free (line);
+			break ;
+		}
 		if (*line)
 			add_history(line);
-		printf("line: %s\n", line);
 		mpc_result_t r;
 		if (mpc_parse("<stdin>", line, Lispy, &r)) {
-			/* On success print and delete the AST */
-			mpc_ast_print(r.output);
+			/* evaluate the AST and print the result */
+			long result = eval(r.output);
+			printf(">\tresult: %li\t<\n", result);
 			mpc_ast_delete(r.output);
 		} else {
 			/* Otherwise print and delete the Error */
@@ -51,5 +57,7 @@ int	main(void)
 		}
 		free(line);
 	}
+	mpc_cleanup(4, Number, Operator, Expr, Lispy);
+	printf("\n>\tMinilisp REPL Bye!\t<\n");
 	return (0);
 }

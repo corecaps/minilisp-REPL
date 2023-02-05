@@ -17,4 +17,8 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "mpc.h"
+
+/* evaluation */
+long	eval_op(long x, char* op, long y);
+long	eval(mpc_ast_t* t);
 #endif //MINILISP_REPL_MINILISP_H
