@@ -18,7 +18,7 @@ RM = rm -f
 SRCDIR = src
 OBJDIR = obj
 BIN = bin
-SRC = main.c
+SRC = main.c mpc.c
 OBJ = $(SRC:.c=.o)
 SOURCE = $(addprefix $(SRCDIR)/,$(SRC))
 OBJECT = $(addprefix $(OBJDIR)/,$(OBJ))

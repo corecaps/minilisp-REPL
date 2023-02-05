@@ -16,5 +16,5 @@
 # include <stdlib.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-
+# include "mpc.h"
 #endif //MINILISP_REPL_MINILISP_H
