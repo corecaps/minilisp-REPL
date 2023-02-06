@@ -12,9 +12,44 @@
 
 #include "minilisp.h"
 
-int	main(void)
+int file_eval(char *const *argv, char *line, int fd, const mpc_parser_t *Number,
+			  const mpc_parser_t *Operator, const mpc_parser_t *Expr,
+			  mpc_parser_t *Lispy)
+{
+	fd = open(argv[1], O_RDONLY);
+	if (fd < 0)
+	{
+		printf(">\tError: File not found\t<\n");
+		return (1);
+	}
+	printf("\n>\tMiniLisp file eval Welcome\t <\n");
+	line = get_next_line(fd);
+	while (line)
+	{
+		mpc_result_t r;
+		if (mpc_parse("<stdin>", line, Lispy, &r))
+		{
+			printf("Expr\t-> %s", line);
+			long result = eval(r.output);
+			printf(">\tresult: %li\t<\n", result);
+			mpc_ast_delete(r.output);
+		}else {
+			/* Otherwise print and delete the Error */
+			mpc_err_print(r.error);
+			mpc_err_delete(r.error);
+		}
+		free(line);
+		line = get_next_line(fd);
+	}
+	mpc_cleanup(4, Number, Operator, Expr, Lispy);
+	printf("\n>\tMinilisp REPL Bye!\t<\n");
+	return (0);
+}
+
+int	main(int argc, char **argv)
 {
 	char	*line;
+	int		fd;
 
 	/* Create Some Parsers */
 	mpc_parser_t* Number   = mpc_new("number");
@@ -31,6 +66,10 @@ int	main(void)
       lispy    : /^/ <operator> <expr>+ /$/ ;             \
     ",
 			  Number, Operator, Expr, Lispy);
+	line = NULL;
+	fd = 0;
+	if (argc == 2)
+		return (file_eval(argv, line, fd, Number, Operator, Expr, Lispy));
 	printf("\n>\tMiniLisp REPL Welcome\t <\n");
 	while (1)
 	{

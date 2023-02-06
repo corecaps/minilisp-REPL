@@ -17,6 +17,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "mpc.h"
+# include "../gnl/get_next_line.h"
 
 /* evaluation */
 long	eval_op(long x, char* op, long y);
