@@ -18,42 +18,13 @@ void grammar_def(const mpc_parser_t *Number, const mpc_parser_t *Operator,
 	mpca_lang(MPCA_LANG_DEFAULT,
 			  "                                                     \
       number   : /-?[0-9]+/ ;                             \
-      operator : '+' | '-' | '*' | '/' | '%' ;            \
+      operator : '+' | '-' | '*' | '/' | '%' | '^' ;            \
       expr     : <number> | '(' <operator> <expr>+ ')' ;  \
       lispy    : /^/ <operator> <expr>+ /$/ ;             \
     ",
 			  Number, Operator, Expr, Lispy);
 }
 
-void REPL(char *line, mpc_parser_t *Lispy)
-{
-	printf("\n>\tMiniLisp REPL Welcome\t <\n");
-	while (1)
-	{
-		line = readline("MiniLisp\t> ");
-		if (!line)
-			break ;
-		if (strcmp(line, "exit") == 0)
-		{
-			free (line);
-			break ;
-		}
-		if (*line)
-			add_history(line);
-		mpc_result_t r;
-		if (mpc_parse("<stdin>", line, Lispy, &r)) {
-			/* evaluate the AST and print the result */
-			long result = eval(r.output);
-			printf(">\tresult: %li\t<\n", result);
-			mpc_ast_delete(r.output);
-		} else {
-			/* Otherwise print and delete the Error */
-			mpc_err_print(r.error);
-			mpc_err_delete(r.error);
-		}
-		free(line);
-	}
-}
 
 int file_eval(char *const *argv, char *line, int fd, const mpc_parser_t *Number,
 			  const mpc_parser_t *Operator, const mpc_parser_t *Expr,
@@ -73,8 +44,10 @@ int file_eval(char *const *argv, char *line, int fd, const mpc_parser_t *Number,
 		if (mpc_parse("<stdin>", line, Lispy, &r))
 		{
 			printf("Expr\t-> %s", line);
-			long result = eval(r.output);
-			printf(">\tresult: %li\t<\n", result);
+			t_lval result = eval(r.output);
+			printf(">\tresult: ");
+			lval_print(result);
+			printf("\t<\n");
 			mpc_ast_delete(r.output);
 		}else {
 			/* Otherwise print and delete the Error */
@@ -91,8 +64,8 @@ int file_eval(char *const *argv, char *line, int fd, const mpc_parser_t *Number,
 
 int	main(int argc, char **argv)
 {
-	char	*line;
-	int		fd;
+	char	*line = NULL;
+	int		fd = 0;
 
 	mpc_parser_t* Number   = mpc_new("number");
 	mpc_parser_t* Operator = mpc_new("operator");
@@ -100,11 +73,36 @@ int	main(int argc, char **argv)
 	mpc_parser_t* Lispy    = mpc_new("lispy");
 
 	grammar_def(Number, Operator, Expr, Lispy);
-	line = NULL;
-	fd = 0;
 	if (argc == 2)
 		return (file_eval(argv, line, fd, Number, Operator, Expr, Lispy));
-	REPL(line, Lispy);
+	printf("\n>\tMiniLisp REPL Welcome\t <\n");
+	while (1)
+	{
+		line = readline("MiniLisp\t> ");
+		if (!line)
+			break ;
+		if (strcmp(line, "exit") == 0)
+		{
+			free (line);
+			break ;
+		}
+		if (*line)
+			add_history(line);
+		mpc_result_t r;
+		if (mpc_parse("<stdin>", line, Lispy, &r)) {
+			/* evaluate the AST and print the result */
+			t_lval result = eval(r.output);
+			printf(">\tresult: ");
+			lval_print(result);
+			printf("\t<\n");
+			mpc_ast_delete(r.output);
+		} else {
+			/* Otherwise print and delete the Error */
+			mpc_err_print(r.error);
+			mpc_err_delete(r.error);
+		}
+		free(line);
+	}
 	mpc_cleanup(4, Number, Operator, Expr, Lispy);
 	printf("\n>\tMinilisp REPL Bye!\t<\n");
 	return (0);

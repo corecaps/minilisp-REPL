@@ -18,8 +18,17 @@
 # include <readline/history.h>
 # include "mpc.h"
 # include "../gnl/get_next_line.h"
+# include <limits.h>
 
+typedef struct s_lval{
+	int type;
+	long num;
+	int err;
+} t_lval;
+enum { LVAL_NUM, LVAL_ERR };
+enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM, LERR_OVERFLOW };
 /* evaluation */
-long	eval_op(long x, char* op, long y);
-long	eval(mpc_ast_t* t);
+t_lval 	eval_op(t_lval x, char* op, t_lval y);
+t_lval 	eval(mpc_ast_t* t);
+void	lval_print(t_lval v);
 #endif //MINILISP_REPL_MINILISP_H
