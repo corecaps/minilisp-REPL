@@ -28,7 +28,7 @@ GNL = gnl/libgnl.a
 all : $(BIN)/$(NAME)
 
 $(BIN)/$(NAME): $(OBJECT) $(GNL)
-	@echo '=======>LINKING <========'
+	@echo "===========>LINKING <============="
 	@mkdir -p $(BIN)
 	$(CC) $(OBJECT) $(LINK) -o $(BIN)/$(NAME)
 
@@ -36,15 +36,15 @@ $(GNL):
 	make -C gnl
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	@echo '=======>COMPILE <========'
+	@echo "=======>COMPILE $< <========"
 	@mkdir -p $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJECT)
+	@$(RM) $(OBJECT)
 
 fclean : clean
-	$(RM) $(BIN)/$(NAME)
+	@$(RM) $(BIN)/$(NAME)
 
 re : fclean $(BIN)/$(NAME)
 
