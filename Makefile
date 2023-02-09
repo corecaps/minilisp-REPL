@@ -18,7 +18,7 @@ RM = rm -f
 SRCDIR = src
 OBJDIR = obj
 BIN = bin
-SRC = main.c mpc.c eval.c
+SRC = main.c mpc.c eval.c lval_construct.c
 OBJ = $(SRC:.c=.o)
 SOURCE = $(addprefix $(SRCDIR)/,$(SRC))
 OBJECT = $(addprefix $(OBJDIR)/,$(OBJ))
